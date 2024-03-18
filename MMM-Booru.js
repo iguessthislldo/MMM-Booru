@@ -1,23 +1,32 @@
 /* Magic Mirror
- * Module: MMM-XKCD
+ * Module: MMM-Booru
  *
- * By jupadin
+ * Based on MMM-XKCD by jupadin
  * MIT Licensed.
  */
 
-Module.register("MMM-XKCD", {
+Module.register('MMM-Booru', {
     // Default module config.
     defaults: {
-        header: "xkcd",
-        dailyJSONURL: "https://xkcd.com/info.0.json",
-        updateInterval: 10 * 60 * 60 * 1000, // 10 hours
+        header: "Booru",
+        updateInterval: 10 * 60,
         grayScale: false,
         invertColors: false,
-        limitComicWidth: 400,
-        limitComicHeight: 0,
-        randomComic: false,
-        alwaysRandom: false,
+        limitWidth: 400,
+        limitHeight: 0,
         showTitle: true,
+        postLog: false,
+        debugLog: false,
+
+        weight: 1,
+        find: [
+            {
+                site: "danbooru.donmai.us",
+                find: [
+                    ["hatsune_miku"],
+                ],
+            },
+        ],
     },
 
     // Define start sequence.
@@ -28,12 +37,14 @@ Module.register("MMM-XKCD", {
         this.animationSpeed = 2000;
         this.scrollProgress = 0;
         this.loaded = false;
+        this.config.postLog = this.config.postLog || this.config.debugLog;
+
         this.sendSocketNotification("SET_CONFIG", this.config);
     },
 
     // Define required styles.
     getStyles: function() {
-        return ["MMM-XKCD.css"];
+        return ["MMM-Booru.css"];
     },
 
     // Define required scripts.
@@ -44,7 +55,7 @@ Module.register("MMM-XKCD", {
     // Define header.
     getHeader: function() {
         if (this.config.showTitle && !this.dailyComicTitle == "") {
-            return this.config.header + " - " + this.dailyComicTitle;
+            return this.dailyComicTitle;
         } else {
             return this.config.header;
         }
@@ -63,10 +74,16 @@ Module.register("MMM-XKCD", {
 
         var comicWrapper = document.createElement("div");
         comicWrapper.id = "comicWrapper";
-        
+
+        console.log(this.dailyComic)
         var comic = document.createElement("img");
         comic.id = "comic"
         comic.src = this.dailyComic;
+
+        var helper = this;
+        comic.onclick = function() {
+            helper.sendSocketNotification("OPEN_CURRENT_POST");
+        };
 
         if (this.config.grayScale || this.config.invertColors) {
             comic.setAttribute("style", "-webkit-filter: " +
@@ -80,11 +97,11 @@ Module.register("MMM-XKCD", {
         // Limit width or height of comic on load
         comic.onload = function() {
             const width = this.width;
-            if (this.config.limitComicHeight > 0) {
-                comic.style.height = this.config.limitComicHeight + "px";
+            if (this.config.limitHeight > 0) {
+                comic.style.height = this.config.limitHeight + "px";
                 comic.style.width = "auto";
-            } else if (this.config.limitComicWidth > 0 && width > this.config.limitComicWidth) {
-                comic.style.width = this.config.limitComicWidth + "px";
+            } else if (this.config.limitWidth > 0 && width > this.config.limitWidth) {
+                comic.style.width = this.config.limitWidth + "px";
                 comic.style.height = "auto";
             }
         };
@@ -99,8 +116,7 @@ Module.register("MMM-XKCD", {
     socketNotificationReceived: function(notification, payload) {
         if (notification === "COMIC") {
             this.loaded = true;
-            this.dailyComic = payload.img;
-            // this.dailyComicTitle = payload.safe_title;
+            this.dailyComic = payload.img_src;
             this.dailyComicTitle = payload.title;
             this.updateDom(this.animationSpeed);
         }

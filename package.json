@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "request": "^2.88.2"
+    "axios": "^1.6.8",
+    "booru": "^2.6.4"
   }
 }
