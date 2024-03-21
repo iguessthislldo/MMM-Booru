@@ -123,7 +123,7 @@ module.exports = NodeHelper.create({
 
         var timeout = this.config.updateInterval;
         if (what_failed) {
-            const secs = 5;
+            const secs = this.config.retryInterval;
             console.error(`ERROR: ${what_failed} ${failure}`);
             console.error(`Trying again in ${secs} seconds`);
             timeout = secs;

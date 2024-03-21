@@ -10,6 +10,7 @@ Module.register('MMM-Booru', {
     defaults: {
         header: "Booru",
         updateInterval: 10 * 60,
+        retryInterval: 10,
         grayScale: false,
         invertColors: false,
         limitWidth: 400,
