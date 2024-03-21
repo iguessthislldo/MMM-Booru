@@ -22,8 +22,9 @@ Module.register('MMM-Booru', {
         find: [
             {
                 site: "danbooru.donmai.us",
+                extraTags: ["rating:general"],
                 find: [
-                    ["hatsune_miku"],
+                    ["hatsune_miku", "score:>=20"],
                 ],
             },
         ],
