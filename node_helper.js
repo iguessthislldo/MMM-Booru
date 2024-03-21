@@ -141,7 +141,7 @@ module.exports = NodeHelper.create({
         }
 
         // Query to get posts
-        booru.search(search.site, [...search.tags], {limit: 10, random: true}).then(posts => {
+        booru.search(search.site, search.tags, {limit: 10, random: true}).then(posts => {
            // Filter out posts we can't use
            var filtered_posts = [];
             for (const post of posts) {
